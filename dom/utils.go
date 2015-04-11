@@ -1,6 +1,6 @@
 package dom
 
-var blockHtmlDom = []string{"body", "div", "p", "ul", "h1", "ul", "h2", "h3", "h4", "h5"}
+var blockHtmlDom = []string{"body", "div", "p", "ul", "ol", "h1", "ul", "h2", "h3", "h4", "h5"}
 var uselessHtmlDom = []string{"img", "br", "hr"}
 
 /**
