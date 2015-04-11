@@ -14,14 +14,14 @@ func Test_Parse(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	root,err := Parse(fi)
+	tree,err := Parse(fi)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	CutStuDomTree(root, true)
-	// print(root)
-	fmt.Println(root.AllText())
+	tree.CutStuDomTree()
+	// print(tree.StuDomNode)
+	fmt.Println(tree.Text())
 }
 
 func print(node *dom.StuDomNode)  {

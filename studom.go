@@ -9,7 +9,7 @@ import(
 	"github.com/zl-leaf/studom/dom"
 )
 
-func Parse(rd io.Reader) (root *dom.StuDomNode, err error) {
+func Parse(rd io.Reader) (root *dom.StuDomTree, err error) {
 	nodes,err := goquery.Parse(rd)
 	if err != nil {
 		return
@@ -18,7 +18,7 @@ func Parse(rd io.Reader) (root *dom.StuDomNode, err error) {
 	return
 }
 
-func ParseString(htm string) (root *dom.StuDomNode, err error) {
+func ParseString(htm string) (root *dom.StuDomTree, err error) {
 	nodes,err := goquery.ParseString(htm)
 	if err != nil {
 		return
@@ -30,11 +30,11 @@ func ParseString(htm string) (root *dom.StuDomNode, err error) {
 /**
  * 解析成stu-dom树
  */
-func parseStuDomTree(ns goquery.Nodes) (root *dom.StuDomNode) {
+func parseStuDomTree(ns goquery.Nodes) (tree *dom.StuDomTree) {
 	divs := ns.Find("body")
 	divRoot := divs[0]
 
-	root = &dom.StuDomNode{}
+	root := new(dom.StuDomNode)
 	root.Tag = "root"
 
 	t := ns.Find("title")[0].Node
@@ -47,6 +47,8 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.StuDomNode) {
 	root.Add(body)
 	body.Parent = root
 
+	tree = new(dom.StuDomTree)
+	tree.StuDomNode = root
 	return
 }
 

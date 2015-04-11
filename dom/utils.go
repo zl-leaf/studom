@@ -3,30 +3,11 @@ package dom
 var blockHtmlDom = []string{"title" , "body", "div", "p", "ul", "ol", "h1", "ul", "h2", "h3", "h4", "h5"}
 var uselessHtmlDom = []string{"img", "br", "hr"}
 
-/**
- * 局部相关度
- */
-func (node *StuDomNode) LocalCorrelativity() float32 {
-    if node.CountLength == 0 {
-        return float32(1)
-    }
-    return float32(node.LinkCount)/float32(node.CountLength)
-}
-
-/**
- * 上下文相关度
- */
-func (node *StuDomNode) ContextualCorrelativity() float32 {
-    parent := node.BlockParent()
-
-    if parent != nil && parent.Tag != "root" {
-        if parent.CountLength == 0 {
-            return float32(1)
-        }
-        return float32(node.LinkCount)/float32(parent.CountLength)
-    }
-    return -1
-}
+const(
+	Cm = 0
+	Lcm = 0.02
+	Ccm = 0.001
+)
 
 /**
  * 判断是否属于分快标签
@@ -55,19 +36,36 @@ func IsUselessDom(tag string) bool {
 }
 
 /**
- * 获取stu-dom树的内容
+ * 剪枝
  */
-func (node *StuDomNode) AllText() string {
-    if node.Tag == "text" {
-        return node.Text
-    }
-    content := ""
+func (node *StuDomNode) CutStuDomTree() {
     for _,child := range node.Child {
-        line := child.AllText()
-        if IsBlockDom(child.Tag) {
-            line += "\n"
-        }
-        content += line
+        child.CutStuDomTree()
     }
-    return content
+
+    if node.Tag=="root" || node.Tag=="h1" || !IsBlockDom(node.Tag) {
+        // root h1 h2 h3 h4 h5 text标签不会被删除
+        return
+    }
+
+    parent := node.BlockParent()
+    if parent == nil || parent.Tag == "root" {
+        return
+    }
+    if IsUselessDom(node.Tag) {
+        parent.Remove(node)
+    }
+
+    if node.CountLength <= Cm {
+        // 空结点
+        parent.Remove(node)
+        return
+    }
+
+    if node.LocalCorrelativity()>=Lcm && node.ContextualCorrelativity()>=Ccm {
+        // 局部不相关
+        parent.Remove(node)
+        return
+    }
+
 }
