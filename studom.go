@@ -138,6 +138,11 @@ func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
 				childStuNode.Parent = stuNode
 			}
 		}
+
+		if stuNode.Tag == "h1" {
+			// h1标题的特殊处理
+			stuNode.LinkCount = 0
+		}
 	}
 	return
 }
