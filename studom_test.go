@@ -3,15 +3,25 @@ package studom
 import(
 	"testing"
 	"fmt"
+	"os"
 
 	"github.com/zl-leaf/studom/dom"
 )
 
-func Test_ParseString(t *testing.T) {
-	htm := "<div>哈哈<div><p>haha</p></div><div><a>test</a></div></div>"
-	root,_ := ParseString(htm)
-	cutStuDomTree(root)
-	print(root)
+func Test_Parse(t *testing.T) {
+	fi,err := os.Open("test.html")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	root,err := Parse(fi)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	CutStuDomTree(root, true)
+	// print(root)
+	fmt.Println(root.AllText())
 }
 
 func print(node *dom.Node)  {
