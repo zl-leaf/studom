@@ -36,9 +36,33 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
 
 	root = &dom.Node{}
 	root.Tag = "root"
-	node := parseStuDomNode(divRoot.Node)
-	root.Add(node)
-	node.Parent = root
+
+	t := ns.Find("title")[0].Node
+	stuTitleNode := parseStuDomTitle(t)
+	root.Add(stuTitleNode)
+	stuTitleNode.Parent = root
+
+	// 获取body信息
+	body := parseStuDomNode(divRoot.Node)
+	root.Add(body)
+	body.Parent = root
+
+	return
+}
+
+func parseStuDomTitle(n *html.Node) (stuTitleNode *dom.Node)  {
+	stuTitleNode = &dom.Node{}
+	stuTitleNode.Tag = "title"
+
+	for _,child := range n.Child {
+		if child.Type == html.TextNode {
+			stuNode := &dom.Node{}
+			stuNode.Tag = "text"
+			stuNode.Text = child.Data
+			stuNode.Parent = stuTitleNode
+			stuTitleNode.Add(stuNode)
+		}
+	}
 
 	return
 }
@@ -46,56 +70,6 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
 /**
  * 解析结点
  */
-/*func parseStuDomNode(parent *dom.Node, n *html.Node) {
-	if n.Type==html.ElementNode && (n.Data=="script" || n.Data=="style" || n.Data=="noscript") {
-		return
-	}
-	if n.Type == html.TextNode {
-		// 文字
-		node := &dom.Node{}
-		node.Tag = "text"
-		node.Text = strings.TrimSpace(n.Data)
-
-		// 取出空格和中间的换行
-		s := strings.Replace(node.Text, " ", "", -1)
-		s = strings.Replace(s, "\n", "", -1)
-
-		node.CountLength = len([]rune(s))
-		node.Parent = parent
-		parent.Add(node)
-		parent.CountLength += node.CountLength
-	} else if n.Type == html.ElementNode {
-		// html标签
-		if n.Data == "a" || n.Data == "button" || n.Data == "input" {
-			if parent.Tag == "" || parent.Tag[0] != 'h' {
-				parent.LinkCount += 1
-				// return
-			}
-		}
-
-		var node *dom.Node
-		needNewNode := false
-		if dom.IsBlockDom(n.Data) {
-			// div标签或者h1 h2 h3...
-			node = &dom.Node{}
-			node.Tag = n.Data
-			node.Parent = parent
-			parent.Add(node)
-			needNewNode = true
-		} else {
-			node = parent
-		}
-
-		for _,child := range n.Child {
-			parseStuDomNode(node, child)
-		}
-		if needNewNode {
-			parent.CountLength += node.CountLength
-			parent.LinkCount += node.LinkCount
-		}
-	}
-	return
-}*/
 
 func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
 	if n.Type==html.ElementNode && (n.Data=="script" || n.Data=="style" || n.Data=="noscript") {
