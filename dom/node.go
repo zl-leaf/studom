@@ -1,18 +1,18 @@
 package dom
 
-type Node struct {
+type StuDomNode struct {
 	LinkCount int
 	CountLength int
 	Text string
 	Tag string
-	Child []*Node
-	Parent *Node
+	Child []*StuDomNode
+	Parent *StuDomNode
 }
 
 /**
  * 获取分快父元素
  */
-func (node *Node) BlockParent() (blockParent *Node) {
+func (node *StuDomNode) BlockParent() (blockParent *StuDomNode) {
 	parent := node.Parent
 	for {
 		if parent==nil || parent.Tag == "root" || IsBlockDom(parent.Tag) {
@@ -24,11 +24,11 @@ func (node *Node) BlockParent() (blockParent *Node) {
 	return
 }
 
-func (node *Node) Add(element *Node) {
+func (node *StuDomNode) Add(element *StuDomNode) {
 	node.Child = append(node.Child, element)
 }
 
-func (node *Node) Remove(element *Node) {
+func (node *StuDomNode) Remove(element *StuDomNode) {
 	tmpNode := element
 	for {
 		if tmpNode.Parent == node {
@@ -36,7 +36,7 @@ func (node *Node) Remove(element *Node) {
 		}
 		tmpNode = tmpNode.Parent
 	}
-	tempChild := make([]*Node, 0)
+	tempChild := make([]*StuDomNode, 0)
 	for _,child := range node.Child {
 		if child != tmpNode {
 			tempChild = append(tempChild, child)

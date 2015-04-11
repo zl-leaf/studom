@@ -24,7 +24,7 @@ func Test_Parse(t *testing.T) {
 	fmt.Println(root.AllText())
 }
 
-func print(node *dom.Node)  {
+func print(node *dom.StuDomNode)  {
 	fmt.Println("我的标签:"+node.Tag)
 	fmt.Println("我的值:"+node.Text)
 

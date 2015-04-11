@@ -14,7 +14,7 @@ const(
  * 剪枝
  * @param node 需要剪枝的结点 complete 是否把无用结点（br、img等）去掉
  */
-func CutStuDomTree(node *dom.Node, complete bool) {
+func CutStuDomTree(node *dom.StuDomNode, complete bool) {
     for _,child := range node.Child {
         CutStuDomTree(child, complete)
     }

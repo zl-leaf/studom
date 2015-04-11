@@ -6,7 +6,7 @@ var uselessHtmlDom = []string{"img", "br", "hr"}
 /**
  * 局部相关度
  */
-func (node *Node) LocalCorrelativity() float32 {
+func (node *StuDomNode) LocalCorrelativity() float32 {
     if node.CountLength == 0 {
         return float32(1)
     }
@@ -16,7 +16,7 @@ func (node *Node) LocalCorrelativity() float32 {
 /**
  * 上下文相关度
  */
-func (node *Node) ContextualCorrelativity() float32 {
+func (node *StuDomNode) ContextualCorrelativity() float32 {
     parent := node.BlockParent()
 
     if parent != nil && parent.Tag != "root" {
@@ -57,7 +57,7 @@ func IsUselessDom(tag string) bool {
 /**
  * 获取stu-dom树的内容
  */
-func (node *Node) AllText() string {
+func (node *StuDomNode) AllText() string {
     if node.Tag == "text" {
         return node.Text
     }
@@ -65,7 +65,7 @@ func (node *Node) AllText() string {
     for _,child := range node.Child {
         line := child.AllText()
         if IsBlockDom(child.Tag) {
-            line += "\r\n"
+            line += "\n"
         }
         content += line
     }

@@ -9,7 +9,7 @@ import(
 	"github.com/zl-leaf/studom/dom"
 )
 
-func Parse(rd io.Reader) (root *dom.Node, err error) {
+func Parse(rd io.Reader) (root *dom.StuDomNode, err error) {
 	nodes,err := goquery.Parse(rd)
 	if err != nil {
 		return
@@ -18,7 +18,7 @@ func Parse(rd io.Reader) (root *dom.Node, err error) {
 	return
 }
 
-func ParseString(htm string) (root *dom.Node, err error) {
+func ParseString(htm string) (root *dom.StuDomNode, err error) {
 	nodes,err := goquery.ParseString(htm)
 	if err != nil {
 		return
@@ -30,11 +30,11 @@ func ParseString(htm string) (root *dom.Node, err error) {
 /**
  * 解析成stu-dom树
  */
-func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
+func parseStuDomTree(ns goquery.Nodes) (root *dom.StuDomNode) {
 	divs := ns.Find("body")
 	divRoot := divs[0]
 
-	root = &dom.Node{}
+	root = &dom.StuDomNode{}
 	root.Tag = "root"
 
 	t := ns.Find("title")[0].Node
@@ -50,13 +50,13 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
 	return
 }
 
-func parseStuDomTitle(n *html.Node) (stuTitleNode *dom.Node)  {
-	stuTitleNode = &dom.Node{}
+func parseStuDomTitle(n *html.Node) (stuTitleNode *dom.StuDomNode)  {
+	stuTitleNode = &dom.StuDomNode{}
 	stuTitleNode.Tag = "title"
 
 	for _,child := range n.Child {
 		if child.Type == html.TextNode {
-			stuNode := &dom.Node{}
+			stuNode := &dom.StuDomNode{}
 			stuNode.Tag = "text"
 			stuNode.Text = child.Data
 			stuNode.Parent = stuTitleNode
@@ -71,7 +71,7 @@ func parseStuDomTitle(n *html.Node) (stuTitleNode *dom.Node)  {
  * 解析结点
  */
 
-func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
+func parseStuDomNode(n *html.Node) (stuNode *dom.StuDomNode) {
 	if n.Type==html.ElementNode && (n.Data=="script" || n.Data=="style" || n.Data=="noscript") {
 		return
 	}
@@ -85,7 +85,7 @@ func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
 			return
 		}
 
-		stuNode = &dom.Node{}
+		stuNode = &dom.StuDomNode{}
 		stuNode.Tag = "text"
 		stuNode.Text = text
 
@@ -93,7 +93,7 @@ func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
 		stuNode.LinkCount = 0
 	} else if n.Type == html.ElementNode {
 		// HTML标签
-		stuNode = &dom.Node{}
+		stuNode = &dom.StuDomNode{}
 
 		isLink := false
 		stuNode.Tag = n.Data
