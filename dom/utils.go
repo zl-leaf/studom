@@ -1,11 +1,15 @@
 package dom
 
-var blockHtmlDom = []string{"div", "p", "h1", "ul", "h2", "h3", "h4", "h5"}
+var blockHtmlDom = []string{"body", "div", "p", "ul", "h1", "ul", "h2", "h3", "h4", "h5"}
+var uselessHtmlDom = []string{"img", "br", "hr"}
 
 /**
  * 局部相关度
  */
 func (node *Node) LocalCorrelativity() float32 {
+    if node.CountLength == 0 {
+        return float32(1)
+    }
     return float32(node.LinkCount)/float32(node.CountLength)
 }
 
@@ -13,8 +17,12 @@ func (node *Node) LocalCorrelativity() float32 {
  * 上下文相关度
  */
 func (node *Node) ContextualCorrelativity() float32 {
-    parent := node.Parent
-    if parent != nil {
+    parent := node.BlockParent()
+
+    if parent != nil && parent.Tag != "root" {
+        if parent.CountLength == 0 {
+            return float32(1)
+        }
         return float32(node.LinkCount)/float32(parent.CountLength)
     }
     return -1
@@ -34,15 +42,28 @@ func IsBlockDom(tag string) bool {
 }
 
 /**
+ * 判断是否属于无用标签
+ */
+func IsUselessDom(tag string) bool {
+    for _, d := range uselessHtmlDom {
+        if d == tag {
+            return true
+        }
+    }
+
+    return false
+}
+
+/**
  * 获取stu-dom树的内容
  */
-func (node *Node) Content() string {
+func (node *Node) AllText() string {
     if node.Tag == "text" {
         return node.Text
     }
     content := ""
     for _,child := range node.Child {
-        line := child.Content()
+        line := child.AllText()
         if IsBlockDom(child.Tag) {
             line += "\r\n"
         }

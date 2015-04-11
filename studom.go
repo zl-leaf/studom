@@ -36,7 +36,9 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
 
 	root = &dom.Node{}
 	root.Tag = "root"
-	parseStuDomNode(root, divRoot.Node)
+	node := parseStuDomNode(divRoot.Node)
+	root.Add(node)
+	node.Parent = root
 
 	return
 }
@@ -44,7 +46,7 @@ func parseStuDomTree(ns goquery.Nodes) (root *dom.Node) {
 /**
  * 解析结点
  */
-func parseStuDomNode(parent *dom.Node, n *html.Node) {
+/*func parseStuDomNode(parent *dom.Node, n *html.Node) {
 	if n.Type==html.ElementNode && (n.Data=="script" || n.Data=="style" || n.Data=="noscript") {
 		return
 	}
@@ -67,7 +69,7 @@ func parseStuDomNode(parent *dom.Node, n *html.Node) {
 		if n.Data == "a" || n.Data == "button" || n.Data == "input" {
 			if parent.Tag == "" || parent.Tag[0] != 'h' {
 				parent.LinkCount += 1
-				return
+				// return
 			}
 		}
 
@@ -90,6 +92,51 @@ func parseStuDomNode(parent *dom.Node, n *html.Node) {
 		if needNewNode {
 			parent.CountLength += node.CountLength
 			parent.LinkCount += node.LinkCount
+		}
+	}
+	return
+}*/
+
+func parseStuDomNode(n *html.Node) (stuNode *dom.Node) {
+	if n.Type==html.ElementNode && (n.Data=="script" || n.Data=="style" || n.Data=="noscript") {
+		return
+	}
+	if n.Type == html.TextNode {
+		// 文字
+		text := strings.TrimSpace(n.Data)
+		// 取出空格和中间的换行
+		text = strings.Replace(text, " ", "", -1)
+		text = strings.Replace(text, "\n", "", -1)
+		if text == "" {
+			return
+		}
+
+		stuNode = &dom.Node{}
+		stuNode.Tag = "text"
+		stuNode.Text = text
+
+		stuNode.CountLength = len([]rune(text))
+		stuNode.LinkCount = 0
+	} else if n.Type == html.ElementNode {
+		// HTML标签
+		stuNode = &dom.Node{}
+
+		isLink := false
+		stuNode.Tag = n.Data
+		if n.Data == "a" || n.Data == "button" || n.Data == "input" {
+			stuNode.LinkCount = 1
+			isLink = true
+		}
+		for _,child := range n.Child {
+			childStuNode := parseStuDomNode(child)
+			if childStuNode != nil {
+				if !isLink {
+					stuNode.CountLength += childStuNode.CountLength
+				}
+				stuNode.LinkCount += childStuNode.LinkCount
+				stuNode.Add(childStuNode)
+				childStuNode.Parent = stuNode
+			}
 		}
 	}
 	return
